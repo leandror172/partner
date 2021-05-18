@@ -10,7 +10,7 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 public class PartnerPayload {
-
+ 
   private UUID id;
   private String tradingName;
   private String ownerName;

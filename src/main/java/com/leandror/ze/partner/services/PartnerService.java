@@ -26,8 +26,8 @@ public class PartnerService {
     return repository.findById(partnerId).map(mapper::toPayload).orElse(null);
   }
 
-  public void save(PartnerPayload payload) {
-    repository.save(mapper.toEntity(payload));
+  public PartnerPayload save(PartnerPayload payload) {
+    return mapper.toPayload(repository.save(mapper.toEntity(payload)));
   }
 
 }
