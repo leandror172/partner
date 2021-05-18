@@ -25,13 +25,6 @@ public class PartnerControllerTest {
 
   private UUID partnerId;
 
-  @BeforeAll
-  static void setUpBeforeClass() throws Exception {
-  }
-
-  @AfterAll
-  static void tearDownAfterClass() throws Exception {
-  }
 
   @BeforeEach
   void setUp() throws Exception {

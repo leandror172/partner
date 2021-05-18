@@ -12,13 +12,22 @@ import com.leandror.ze.partner.mappers.PartnerMapper;
 @Service
 public class PartnerService {
   
-  @Autowired
   private PartnerRepository repository;
-  @Autowired
   private PartnerMapper mapper;
 
+  @Autowired
+  public PartnerService(PartnerRepository repository, PartnerMapper mapper) {
+    super();
+    this.repository = repository;
+    this.mapper = mapper;
+  }
+
   public PartnerPayload get(UUID partnerId) {
-    return repository.findById(partnerId).map(mapper::map).orElse(null);
+    return repository.findById(partnerId).map(mapper::toPayload).orElse(null);
+  }
+
+  public void save(PartnerPayload payload) {
+    repository.save(mapper.toEntity(payload));
   }
 
 }

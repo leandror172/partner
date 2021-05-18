@@ -17,6 +17,6 @@ public class PartnerController {
   @GetMapping(path = "/{id}", produces = "application/json")
   public PartnerPayload getPartner(@PathVariable  UUID id) {
     
-    return new PartnerPayload();
+    return new PartnerPayload(id, null, null, null);
   }
 }

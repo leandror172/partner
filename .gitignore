@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+src/main/java/com/leandror/ze/partner/mappers/MyClass.java
+
+src/main/java/com/leandror/ze/partner/mappers/MyClassOld.java
