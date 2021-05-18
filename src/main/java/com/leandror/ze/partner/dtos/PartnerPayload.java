@@ -8,5 +8,8 @@ import lombok.Data;
 public class PartnerPayload {
 
   private UUID id;
+  private String tradingName;
+  private String ownerName;
+  private String document;
 
 }

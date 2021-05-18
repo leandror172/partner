@@ -22,7 +22,7 @@ public class PartnerControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
-  
+
   private UUID partnerId;
 
   @BeforeAll
@@ -44,7 +44,8 @@ public class PartnerControllerTest {
 
   @Test
   void requestMatchTest() throws Exception {
-      mockMvc.perform(get("/api/v1/partner/".concat(partnerId.toString())).contentType("application/json")).andExpect(status().isOk());
+    mockMvc.perform(get("/api/v1/partner/".concat(partnerId.toString())).contentType("application/json"))
+           .andExpect(status().isOk());
   }
 
 }
