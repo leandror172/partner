@@ -15,13 +15,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leandror.ze.partner.dtos.PartnerPayload;
 import com.leandror.ze.partner.services.PartnerService;
@@ -49,48 +50,59 @@ public class PartnerControllerTest {
   }
 
   @Test
-  void requestMatchTest(@Random UUID partnerId) throws Exception {
-    mockMvc.perform(get("/api/v1/partner/{partnerId}", partnerId).contentType("application/json"))
-           .andExpect(status().isOk());
+  void returnOkWhenGetExistingPartner(@Random PartnerPayload payload) throws Exception {
+
+    when(service.get(payload.getId())).thenReturn(Optional.of(payload));
+
+    String result = mockMvc.perform(apiCallGet(payload.getId()))
+                           .andExpect(status().isOk())
+                           .andReturn()
+                           .getResponse()
+                           .getContentAsString();
+
+    verify(service, times(1)).get(payload.getId());
+    assertThat(payload).isEqualTo(objectMapper.readValue(result, PartnerPayload.class));
   }
 
   @Test
-  void returnOkWhenPostNewPartner(@Random(excludes = "id") PartnerPayload payload) throws Exception {
-    mockMvc.perform(post("/api/v1/partner").contentType("application/json")
-                                           .content(objectMapper.writeValueAsString(payload)))
-           .andExpect(status().isOk());
+  void returnNotFoundWhenGetNonExistingPartner(@Random UUID partnerId) throws Exception {
+
+    when(service.get(partnerId)).thenReturn(Optional.empty());
+
+    mockMvc.perform(apiCallGet(partnerId)).andExpect(status().isNotFound());
+
+    verify(service, times(1)).get(partnerId);
   }
 
   @Test
   void returnOkWhenPostExistingPartner(@Random PartnerPayload payload) throws Exception {
-    mockMvc.perform(post("/api/v1/partner").contentType("application/json")
-                                           .content(objectMapper.writeValueAsString(payload)))
-           .andExpect(status().isOk());
+    mockMvc.perform(apiCallPost(payload)).andExpect(status().isOk());
   }
 
   @Test
-  void returnOkWhenGetExistingPartner(@Random UUID partnerId, @Random(excludes = "id") PartnerPayload payload)
+  void returnOkAndNewIdWhenPostNewPartner(@Random UUID partnerId, @Random(excludes = "id") PartnerPayload payload)
       throws Exception {
-    payload.setId(partnerId);
-    when(service.get(partnerId)).thenReturn(Optional.of(payload));
 
-    mockMvc.perform(get("/api/v1/partner/{partnerId}", partnerId).contentType("application/json"))
-           .andExpect(status().isOk());
+    when(service.save(payload)).thenReturn(new PartnerPayload(partnerId,
+                                                              payload.getTradingName(),
+                                                              payload.getOwnerName(),
+                                                              payload.getDocument()));
 
-    verify(service, times(1)).get(partnerId); 
-    assertThat(partnerId).isEqualTo(partnerId);
+    String result = mockMvc.perform(apiCallPost(payload))
+                           .andExpect(status().isOk())
+                           .andReturn()
+                           .getResponse()
+                           .getContentAsString();
+
+    verify(service, times(1)).save(payload);
+    assertThat(partnerId).isEqualTo(UUID.fromString(objectMapper.readTree(result).get("id").asText()));
   }
 
-  @Test
-  void returnNotFoundWhenGetNonExistingPartner(@Random UUID partnerId)
-      throws Exception {
-    when(service.get(partnerId)).thenReturn(null);
-
-    mockMvc.perform(get("/api/v1/partner/{partnerId}", partnerId).contentType("application/json"))
-           .andExpect(status().isNotFound());
-
-    verify(service, times(1)).get(partnerId); 
-    assertThat(partnerId).isEqualTo(partnerId);
+  private MockHttpServletRequestBuilder apiCallGet(UUID partnerId) {
+    return get("/api/v1/partner/{partnerId}", partnerId).contentType("application/json");
   }
 
+  private MockHttpServletRequestBuilder apiCallPost(PartnerPayload payload) throws JsonProcessingException {
+    return post("/api/v1/partner").contentType("application/json").content(objectMapper.writeValueAsString(payload));
+  }
 }
