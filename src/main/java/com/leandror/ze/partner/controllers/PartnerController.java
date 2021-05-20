@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.leandror.ze.partner.dtos.PartnerPayload;
+import com.leandror.ze.partner.exceptions.ResourceNotFoundException;
 import com.leandror.ze.partner.services.PartnerService;
 
 @RestController()
@@ -26,7 +27,7 @@ public class PartnerController {
 
   @GetMapping(path = "/{id}", produces = "application/json")
   public PartnerPayload getPartner(@PathVariable  UUID id) {
-    return service.get(id).get();
+    return service.get(id).orElseThrow(() -> new ResourceNotFoundException());
   }
 
   @PostMapping(produces = "application/json")
