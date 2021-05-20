@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
@@ -54,14 +55,14 @@ public class PartnerControllerTest {
   }
 
   @Test
-  void returnOkWhenGivenNewPartner(@Random(excludes = "id") PartnerPayload payload) throws Exception {
+  void returnOkWhenPostNewPartner(@Random(excludes = "id") PartnerPayload payload) throws Exception {
     mockMvc.perform(post("/api/v1/partner").contentType("application/json")
                                            .content(objectMapper.writeValueAsString(payload)))
            .andExpect(status().isOk());
   }
 
   @Test
-  void returnOkWhenGivenExistingPartner(@Random PartnerPayload payload) throws Exception {
+  void returnOkWhenPostExistingPartner(@Random PartnerPayload payload) throws Exception {
     mockMvc.perform(post("/api/v1/partner").contentType("application/json")
                                            .content(objectMapper.writeValueAsString(payload)))
            .andExpect(status().isOk());
@@ -71,7 +72,7 @@ public class PartnerControllerTest {
   void returnOkWhenGetExistingPartner(@Random UUID partnerId, @Random(excludes = "id") PartnerPayload payload)
       throws Exception {
     payload.setId(partnerId);
-    when(service.get(partnerId)).thenReturn(payload);
+    when(service.get(partnerId)).thenReturn(Optional.of(payload));
 
     mockMvc.perform(get("/api/v1/partner/{partnerId}", partnerId).contentType("application/json"))
            .andExpect(status().isOk());

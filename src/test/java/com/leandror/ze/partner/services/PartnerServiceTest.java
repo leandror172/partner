@@ -1,7 +1,8 @@
 package com.leandror.ze.partner.services;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,9 +14,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -25,23 +26,23 @@ import com.leandror.ze.partner.mappers.PartnerMapper;
 import com.leandror.ze.partner.mappers.PartnerMapperImpl;
 import com.leandror.ze.partner.model.Partner;
 
-@ExtendWith(MockitoExtension.class)
+import io.github.glytching.junit.extension.random.Random;
+import io.github.glytching.junit.extension.random.RandomBeansExtension;
+
+@ExtendWith({ MockitoExtension.class, RandomBeansExtension.class })
 @SpringBootTest(classes = { PartnerMapper.class, PartnerMapperImpl.class })
 public class PartnerServiceTest {
 
-//  @InjectMocks
   private PartnerService service;
   @Mock
   private PartnerRepository repository;
-  @Spy
-  private PartnerMapper mapper;
 
   private UUID partnerId;
 
   @BeforeEach
   void setUp() throws Exception {
     MockitoAnnotations.openMocks(this);
-    service = new PartnerService(repository, mapper);
+    service = new PartnerService(repository, PartnerMapper.INSTANCE);
     partnerId = UUID.randomUUID();
   }
 
@@ -50,28 +51,30 @@ public class PartnerServiceTest {
   }
 
   @Test
-  void noPartnerReturnedIfPartnerNotFound() {
-    assertNull(service.get(partnerId));
-  }
-
-  @Test
   void partnerReturnedIfPartnerIdMatches() {
     // very tight coupled!! this test should be changed!
     var partner = new Partner(partnerId, randomAlphabetic(50), randomAlphabetic(50), randomAlphabetic(14));
     when(repository.findById(partnerId)).thenReturn(Optional.of(partner));
-    assertNull(service.get(partnerId));
+    var result = service.get(partnerId);
+    assertThat(result).isNotEqualTo(Optional.empty());
     verify(repository, times(1)).findById(partnerId);
-    verify(mapper, times(1)).toPayload(partner);
   }
 
   @Test
-  void partnerCreatedIfPartnerCreationExecuted() {
+  void partnerNotReturnedIfPartnerNotFound() {
+    when(repository.findById(partnerId)).thenReturn(Optional.empty());
+    assertThat(service.get(partnerId)).isEqualTo(Optional.empty());
+    verify(repository, times(1)).findById(partnerId);
+  }
+
+  @Test
+  void partnerCreatedIfPartnerCreationExecuted(@Random UUID partnerId) {
     var payload = new PartnerPayload(null, randomAlphabetic(50), randomAlphabetic(50), randomAlphabetic(14));
-    var partner = new Partner(payload.getId(), payload.getTradingName(), payload.getOwnerName(), payload.getDocument());
-    when(mapper.toEntity(payload)).thenReturn(partner);
+    var partnerSaved = new Partner(partnerId, payload.getTradingName(), payload.getOwnerName(), payload.getDocument());
+    when(repository.save(any(Partner.class))).thenReturn(partnerSaved);
     service.save(payload);
-    verify(repository, times(1)).save(partner);
-    verify(mapper, times(1)).toEntity(payload);
+    ArgumentCaptor<Partner> captor = ArgumentCaptor.forClass(Partner.class);
+    verify(repository, times(1)).save(captor.capture());
   }
 
 }

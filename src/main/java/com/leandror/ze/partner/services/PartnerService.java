@@ -1,5 +1,6 @@
 package com.leandror.ze.partner.services;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +23,14 @@ public class PartnerService {
     this.mapper = mapper;
   }
 
-  public PartnerPayload get(UUID partnerId) {
-    return repository.findById(partnerId).map(mapper::toPayload).orElse(null);
+  public Optional<PartnerPayload> get(UUID partnerId) {
+    var result = repository.findById(partnerId);
+    return result.map(mapper::toPayload);
   }
 
   public PartnerPayload save(PartnerPayload payload) {
-    return mapper.toPayload(repository.save(mapper.toEntity(payload)));
+    var result = repository.save(mapper.toEntity(payload));
+    return mapper.toPayload(result);
   }
 
 }

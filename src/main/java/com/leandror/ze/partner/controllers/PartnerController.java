@@ -26,7 +26,7 @@ public class PartnerController {
 
   @GetMapping(path = "/{id}", produces = "application/json")
   public PartnerPayload getPartner(@PathVariable  UUID id) {
-    return service.get(id);
+    return service.get(id).get();
   }
 
   @PostMapping(produces = "application/json")
