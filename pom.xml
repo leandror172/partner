@@ -22,6 +22,7 @@
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 		<lombok-version>1.18.20</lombok-version>
+		<sf-geojson.version>2.0.5</sf-geojson.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -110,6 +111,11 @@
 			<version>2.4.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>mil.nga.sf</groupId>
+			<artifactId>sf-geojson</artifactId>
+			<version>${sf-geojson.version}</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -170,6 +176,12 @@
 					<source>${maven.compiler.source}</source> <!-- depending on your project -->
 					<target>${maven.compiler.target}</target> <!-- depending on your project -->
 					<annotationProcessorPaths>
+						<!-- Used to make lombok work with mapstruct -->
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok-mapstruct-binding</artifactId>
+							<version>0.2.0</version>
+						</path>
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
@@ -179,12 +191,6 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>${lombok-version}</version>
-						</path>
-						<!-- Used to make lombok work with mapstruct -->
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok-mapstruct-binding</artifactId>
-							<version>0.2.0</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
