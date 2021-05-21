@@ -29,6 +29,9 @@ import com.leandror.ze.partner.services.PartnerService;
 
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
+import mil.nga.sf.geojson.MultiPoint;
+import mil.nga.sf.geojson.Point;
+import mil.nga.sf.geojson.Position;
 
 @ExtendWith({ SpringExtension.class, RandomBeansExtension.class })
 @WebMvcTest(controllers = PartnerController.class)
@@ -54,7 +57,7 @@ public class PartnerControllerTest {
 
     when(service.get(payload.getId())).thenReturn(Optional.of(payload));
 
-    String result = mockMvc.perform(apiCallGet(payload.getId()))
+    String result = mockMvc.perform(apiCallGetPartner(payload.getId()))
                            .andExpect(status().isOk())
                            .andReturn()
                            .getResponse()
@@ -69,14 +72,14 @@ public class PartnerControllerTest {
 
     when(service.get(partnerId)).thenReturn(Optional.empty());
 
-    mockMvc.perform(apiCallGet(partnerId)).andExpect(status().isNotFound());
+    mockMvc.perform(apiCallGetPartner(partnerId)).andExpect(status().isNotFound());
 
     verify(service, times(1)).get(partnerId);
   }
 
   @Test
   void returnOkWhenPostExistingPartner(@Random PartnerPayload payload) throws Exception {
-    mockMvc.perform(apiCallPost(payload)).andExpect(status().isOk());
+    mockMvc.perform(apiCallPostPartner(payload)).andExpect(status().isOk());
   }
 
   @Test
@@ -88,7 +91,7 @@ public class PartnerControllerTest {
                                                               payload.getOwnerName(),
                                                               payload.getDocument()));
 
-    String result = mockMvc.perform(apiCallPost(payload))
+    String result = mockMvc.perform(apiCallPostPartner(payload))
                            .andExpect(status().isOk())
                            .andReturn()
                            .getResponse()
@@ -98,11 +101,20 @@ public class PartnerControllerTest {
     assertThat(partnerId).isEqualTo(UUID.fromString(objectMapper.readTree(result).get("id").asText()));
   }
 
-  private MockHttpServletRequestBuilder apiCallGet(UUID partnerId) {
+  @Test
+  void returnNotFoundWhenSearchNearestPartnerAndThereIsNoPartner(@Random Double longitude, @Random Double latitude)
+      throws Exception {
+    mockMvc.perform(get("/api/v1/partner/near").contentType("application/json")
+                                               .queryParam("longitude", String.valueOf(longitude))
+                                               .queryParam("latitude", String.valueOf(latitude)))
+           .andExpect(status().isNotFound());
+  }
+
+  private MockHttpServletRequestBuilder apiCallGetPartner(UUID partnerId) {
     return get("/api/v1/partner/{partnerId}", partnerId).contentType("application/json");
   }
 
-  private MockHttpServletRequestBuilder apiCallPost(PartnerPayload payload) throws JsonProcessingException {
+  private MockHttpServletRequestBuilder apiCallPostPartner(PartnerPayload payload) throws JsonProcessingException {
     return post("/api/v1/partner").contentType("application/json").content(objectMapper.writeValueAsString(payload));
   }
 }

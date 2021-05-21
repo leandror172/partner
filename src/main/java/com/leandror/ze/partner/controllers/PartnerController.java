@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.leandror.ze.partner.dtos.PartnerPayload;
@@ -33,5 +34,10 @@ public class PartnerController {
   @PostMapping(produces = "application/json")
   public PartnerPayload savePartner(@RequestBody PartnerPayload partnerPayload) {
     return service.save(partnerPayload);
+  }
+
+  @GetMapping(path = "/near", produces = "application/json")
+  public PartnerPayload getNearestPartner(@RequestParam Double longitude, @RequestParam Double latitude) {
+    return service.searchNearest(longitude, latitude).orElseThrow(() -> new ResourceNotFoundException("No partner found!"));
   }
 }
