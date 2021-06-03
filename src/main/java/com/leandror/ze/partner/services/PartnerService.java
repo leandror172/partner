@@ -6,9 +6,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.leandror.ze.partner.PartnerRepository;
 import com.leandror.ze.partner.dtos.PartnerPayload;
 import com.leandror.ze.partner.mappers.PartnerMapper;
+import com.leandror.ze.partner.repositories.PartnerRepository;
 
 @Service
 public class PartnerService {

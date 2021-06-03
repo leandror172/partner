@@ -19,11 +19,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.leandror.ze.partner.PartnerRepository;
 import com.leandror.ze.partner.dtos.PartnerPayload;
 import com.leandror.ze.partner.mappers.PartnerMapper;
 import com.leandror.ze.partner.mappers.PartnerMapperImpl;
 import com.leandror.ze.partner.model.Partner;
+import com.leandror.ze.partner.repositories.PartnerRepository;
 
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;

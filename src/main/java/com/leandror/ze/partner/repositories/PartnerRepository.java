@@ -1,4 +1,4 @@
-package com.leandror.ze.partner;
+package com.leandror.ze.partner.repositories;
 
 import java.util.UUID;
 
