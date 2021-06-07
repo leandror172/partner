@@ -27,4 +27,7 @@ public class Partner {
   private String tradingName;
   private String ownerName;
   private String document;
+  private EntityPoint address;
+
+
 }
