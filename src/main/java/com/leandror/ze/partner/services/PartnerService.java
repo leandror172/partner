@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.leandror.ze.partner.dtos.PartnerPayload;
 import com.leandror.ze.partner.mappers.PartnerMapper;
+import com.leandror.ze.partner.model.Partner;
 import com.leandror.ze.partner.repositories.PartnerRepository;
 
 @Service
@@ -24,13 +25,16 @@ public class PartnerService {
   }
 
   public Optional<PartnerPayload> get(UUID partnerId) {
-    var result = repository.findById(partnerId);
-    return result.map(mapper::toPayload);
+    return repository.findById(partnerId).map(mapper::toPayload);
   }
 
   public PartnerPayload save(PartnerPayload payload) {
-    var result = repository.save(mapper.toEntity(payload));
-    return mapper.toPayload(result);
+    return mapper.toPayload(repository.save(mapper.toEntity(payload)));
+  }
+
+  public Optional<PartnerPayload> searchNearest(Double longitude, Double latitude) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

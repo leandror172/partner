@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.leandror.ze.partner.dtos.PartnerPayload;
 import com.leandror.ze.partner.mappers.PartnerMapper;
 import com.leandror.ze.partner.mappers.PartnerMapperImpl;
+import com.leandror.ze.partner.model.EntityPoint;
 import com.leandror.ze.partner.model.Partner;
 import com.leandror.ze.partner.repositories.PartnerRepository;
 
@@ -47,8 +49,10 @@ public class PartnerServiceTest {
   }
 
   @Test
-  void partnerReturnedIfPartnerIdMatches(@Random Partner partner) {
+  void partnerReturnedIfPartnerIdMatches(@Random(excludes = "address") Partner partner,
+                                         @Random(type = Double.class, size = 2) List<Double> coordinates) {
 
+    partner.setAddress(new EntityPoint(coordinates));
     when(repository.findById(partner.getId())).thenReturn(Optional.of(partner));
     var result = service.get(partner.getId());
     assertThat(result).isNotEqualTo(Optional.empty());
@@ -64,14 +68,27 @@ public class PartnerServiceTest {
   }
 
   @Test
-  void partnerCreatedIfPartnerCreationExecuted(@Random Partner partner) {
+  void partnerCreatedIfPartnerCreationExecuted(@Random(excludes = "address") Partner partner,
+                                               @Random(type = Double.class, size = 2) List<Double> coordinates) {
 
     // very tight coupled!! maybe this test should be changed?
-    var payload = new PartnerPayload(null, partner.getTradingName(), partner.getOwnerName(), partner.getDocument());
+    partner.setAddress(new EntityPoint(coordinates));
+    var payload = new PartnerPayload(null,
+                                     partner.getTradingName(),
+                                     partner.getOwnerName(),
+                                     partner.getDocument(),
+                                     partner.getAddress().getLocation());
     when(repository.save(any(Partner.class))).thenReturn(partner);
     service.save(payload);
     ArgumentCaptor<Partner> captor = ArgumentCaptor.forClass(Partner.class);
     verify(repository, times(1)).save(captor.capture());
   }
 
+  @Test
+  void partnerNotReturnedIfSearchNearestPartnerAndThereIsNoPartner(@Random Double longitude, @Random Double latitude) {
+
+//    when(repository.findNearest(longitude, latitude)).thenReturn(Optional.empty());
+//    assertThat(service.searchNearest(longitude, latitude)).isEqualTo(Optional.empty());
+//    verify(repository, times(1)).findNearest(longitude, latitude);
+  }
 }
