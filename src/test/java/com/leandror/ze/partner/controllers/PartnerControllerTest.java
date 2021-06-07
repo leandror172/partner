@@ -29,9 +29,6 @@ import com.leandror.ze.partner.services.PartnerService;
 
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
-import mil.nga.sf.geojson.MultiPoint;
-import mil.nga.sf.geojson.Point;
-import mil.nga.sf.geojson.Position;
 
 @ExtendWith({ SpringExtension.class, RandomBeansExtension.class })
 @WebMvcTest(controllers = PartnerController.class)
@@ -89,7 +86,8 @@ public class PartnerControllerTest {
     when(service.save(payload)).thenReturn(new PartnerPayload(partnerId,
                                                               payload.getTradingName(),
                                                               payload.getOwnerName(),
-                                                              payload.getDocument()));
+                                                              payload.getDocument(),
+                                                              payload.getAddress()));
 
     String result = mockMvc.perform(apiCallPostPartner(payload))
                            .andExpect(status().isOk())
