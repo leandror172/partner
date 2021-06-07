@@ -23,16 +23,18 @@
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 		<lombok-version>1.18.20</lombok-version>
 		<sf-geojson.version>2.0.5</sf-geojson.version>
+		<spring-data-redis.version>2.5.1</spring-data-redis.version>
+		<redis.clients-jedis.version>3.6.0</redis.clients-jedis.version>
+		<jackson-datatype-jts.version>2.3</jackson-datatype-jts.version>
+		<geotools.version>13.0</geotools.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-jpa</artifactId> 
+			</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
@@ -59,16 +61,9 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.oracle.database.jdbc</groupId>
-			<artifactId>ojdbc8</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+		<!-- <dependency> <groupId>com.h2database</groupId> <artifactId>h2</artifactId> 
+			<scope>runtime</scope> </dependency> <dependency> <groupId>com.oracle.database.jdbc</groupId> 
+			<artifactId>ojdbc8</artifactId> <scope>runtime</scope> </dependency> -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -115,6 +110,35 @@
 			<groupId>mil.nga.sf</groupId>
 			<artifactId>sf-geojson</artifactId>
 			<version>${sf-geojson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-redis</artifactId>
+			<version>${spring-data-redis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${redis.clients-jedis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.bedatadriven</groupId>
+			<artifactId>jackson-datatype-jts</artifactId>
+			<version>${jackson-datatype-jts.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-spatial</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-shapefile</artifactId>
+			<version>${geotools.version}</version>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>
@@ -176,11 +200,11 @@
 					<source>${maven.compiler.source}</source> <!-- depending on your project -->
 					<target>${maven.compiler.target}</target> <!-- depending on your project -->
 					<annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${lombok-version}</version>
-            </path>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok-version}</version>
+						</path>
 						<!-- Used to make lombok work with mapstruct -->
 						<path>
 							<groupId>org.projectlombok</groupId>
@@ -197,5 +221,16 @@
 			</plugin>
 		</plugins>
 	</build>
-
+	<repositories>
+		<repository>
+			<id>Hibernate Spatial repo</id>
+			<url>http://www.hibernatespatial.org/repository</url>
+		</repository>
+		<repository>
+			<id>geotools</id>
+			<name>Geotools repository</name>
+			<!--<url>http://download.osgeo.org/webdav/geotools/</url> -->
+			<url>https://repo.osgeo.org/repository/geotools-releases/</url>
+		</repository>
+	</repositories>
 </project>
